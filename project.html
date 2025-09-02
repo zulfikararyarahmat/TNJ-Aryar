@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Arya.Sundanisee — Ultra Game Portal</title>
+<style>
+  /* ===== Reset & base ===== */
+  :root{
+    --bg-1:#0b1020;
+    --glass: rgba(255,255,255,0.04);
+    --accent1: #ff6b6b;
+    --accent2: #ffd54b;
+    --neon1: #7bf7ff;
+    --neon2: #ff7bd6;
+    --muted: rgba(255,255,255,0.7);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; background: radial-gradient(ellipse at 10% 10%, rgba(255,255,255,0.03), transparent 20%), linear-gradient(135deg,#071029 0%, #0b1020 50%); color:#fff; }
+  a{ color:inherit; text-decoration:none; }
+
+  /* ===== Layout card ===== */
+  .wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px; gap:20px; }
+  .card{ width:1100px; max-width:98%; height:720px; max-height:94vh; border-radius:18px; display:grid; grid-template-columns:420px 1fr; overflow:hidden; position:relative;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px) saturate(120%);
+  }
+  .bg-anim{ position:absolute; inset:0; z-index:-3; background: linear-gradient(120deg,#2b2bff,#ff416c,#ffd54b); background-size:300% 300%; opacity:.18; animation:bgMove 14s linear infinite; mix-blend-mode:screen; }
+  @keyframes bgMove{ 0%{ background-position:0% 50% }50%{ background-position:100% 50% }100%{ background-position:0% 50% } }
+
+  /* left column */
+  .left{ padding:36px; display:flex; flex-direction:column; gap:16px; border-right:1px solid rgba(255,255,255,0.03); }
+  .logo{ width:64px; height:64px; border-radius:14px; display:grid; place-items:center; font-weight:900; font-size:20px; background: conic-gradient(#ff8a00,#ff4b1f,#6a11cb); box-shadow:0 12px 40px rgba(0,0,0,0.45); color:#061022; }
+  h1.title{ font-size:20px; margin:0; letter-spacing:0.4px; }
+  p.sub{ margin:0; color:var(--muted); font-size:13px; }
+
+  .hero{ margin-top:8px; font-size:20px; font-weight:700; color:#fff; }
+  .hintCard{ margin-top:14px; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); display:flex; justify-content:space-between; align-items:center; }
+  .hintCard small{ color:var(--muted); }
+  .foot{ margin-top:auto; color:rgba(255,255,255,0.65); font-size:12px; text-align:right; }
+
+  /* right column */
+  .right{ padding:32px; display:flex; flex-direction:column; gap:12px; }
+
+  .tabs{ display:flex; gap:8px; align-items:center; }
+  .tab{ padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:700; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); }
+  .tab.active{ background: linear-gradient(90deg,var(--accent2),var(--accent1)); color:#081220; box-shadow:0 10px 30px rgba(255,107,61,0.16); transform:translateY(-2px); }
+
+  .panel{ margin-top:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; border:1px solid rgba(255,255,255,0.03); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
+  label{ display:block; font-size:13px; color:#fff; margin-bottom:6px; }
+  .input{ width:100%; padding:12px 14px; border-radius:10px; border:none; background: rgba(255,255,255,0.04); color:#fff; font-size:14px; outline:none; }
+  .row{ display:flex; gap:8px; margin-top:10px; }
+
+  .btn{ padding:10px 14px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background: linear-gradient(90deg,var(--accent2),var(--accent1)); color:#081220; box-shadow:0 8px 24px rgba(255,107,61,0.14); }
+  .btn.ghost{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); box-shadow:none; }
+  .btn.neon{ background: linear-gradient(90deg,var(--neon1),var(--neon2)); color:#081220; box-shadow:0 12px 40px rgba(123,247,255,0.08); }
+
+  /* menu grid */
+  .menu-grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:12px; }
+  .game-card{ padding:14px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); text-align:center; cursor:pointer; border:1px solid rgba(255,255,255,0.03); transition:transform .16s, box-shadow .16s; }
+  .game-card:hover{ transform:translateY(-6px); box-shadow:0 18px 50px rgba(0,0,0,0.35); border-color: rgba(255,200,80,0.28); }
+
+  /* game area */
+  .game-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .hud{ display:flex; gap:8px; align-items:center; }
+  .pill{ padding:8px 10px; border-radius:999px; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); font-weight:700; font-size:13px; }
+
+  /* TicTacToe - clear grid */
+  .ttt-frame{ margin:18px auto 0; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .ttt-grid{ display:grid; grid-template-columns: repeat(3,120px); gap:0; border-radius:14px; overflow:hidden; border:6px solid rgba(255,255,255,0.1); box-shadow:0 24px 50px rgba(0,0,0,0.45); }
+  .ttt-cell{ width:120px; height:120px; display:grid; place-items:center; font-size:56px; font-weight:900; cursor:pointer; border-left:1px solid rgba(255,255,255,0.06); border-top:1px solid rgba(255,255,255,0.06); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:#fff; transition: transform .06s, box-shadow .08s; }
+  .ttt-cell:hover{ transform: translateY(-4px); box-shadow:0 12px 30px rgba(0,0,0,0.35); }
+  .ttt-x{ color:var(--neon1); text-shadow:0 6px 22px rgba(123,247,255,0.18); }
+  .ttt-o{ color:var(--neon2); text-shadow:0 6px 22px rgba(255,123,214,0.18); }
+  .ttt-win{ background: linear-gradient(90deg, rgba(255,213,75,0.22), rgba(255,255,255,0.02)); box-shadow:0 18px 40px rgba(255,213,75,0.12); border-color: var(--accent2); }
+
+  /* Snake neon */
+  .canvas-wrap{ width:460px; height:460px; margin:18px auto 0; border-radius:16px; overflow:hidden; position:relative; border:1px solid rgba(255,255,255,0.06); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow: inset 0 2px 0 rgba(255,255,255,0.02); }
+  .grid-overlay{ position:absolute; inset:0; pointer-events:none; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size:20px 20px,20px 20px; opacity:.55; }
+
+  canvas#snakeCanvas{ display:block; width:100%; height:100%; background:#05060a; }
+
+  /* end message */
+  .endbox{ margin-top:16px; font-weight:900; color:var(--accent2); min-height:28px; white-space:pre-line; font-size:15px; text-shadow:0 2px 6px rgba(0,0,0,0.6); }
+  .hidden{ display:none !important; }
+
+  /* toast */
+  .toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:26px; padding:10px 14px; border-radius:12px; background:rgba(8,10,18,0.9); color:#fff; border:1px solid rgba(255,255,255,0.04); box-shadow:0 10px 30px rgba(0,0,0,0.45); opacity:0; transition: .24s; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+
+  /* responsive */
+  @media (max-width:1020px){
+    .card{ grid-template-columns:1fr; height:auto; max-height:none; padding-bottom:20px; }
+    .left{ order:2; border-right:none; border-top:1px solid rgba(255,255,255,0.04); padding-top:20px; }
+    .right{ order:1; padding-top:20px; }
+    .ttt-grid{ grid-template-columns: repeat(3, 88px); } .ttt-cell{ width:88px; height:88px; font-size:36px; }
+    .canvas-wrap{ width:92%; height:360px; }
+  }
+
+</style>
+</head>
+<body>
+  <div class="bg-anim" aria-hidden="true"></div>
+  <div class="wrap">
+    <main class="card" role="main" aria-labelledby="portalTitle">
+      <!-- LEFT: branding -->
+      <aside class="left" aria-hidden="false">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div class="logo" aria-hidden="true">AS</div>
+          <div>
+            <h1 class="title" id="portalTitle">Arya.Sundanisee</h1>
+            <p class="sub">Ultra Game Portal — Login & Play</p>
+          </div>
+        </div>
+
+        <div class="hero">Selamat datang di Portal Game 🎮</div>
+        <div class="sub">Mainkan TicTacToe (2 pemain) & Snake Neon — reset kapan saja, difficulty, confetti, suara, dan highscore.</div>
+
+        <div class="hintCard" role="note">
+          <small>Tip</small>
+          <div class="hint">Simpan sebagai <code>arya-game-portal-ultra.html</code> lalu buka di browser</div>
+        </div>
+
+        <div class="foot">Made with ❤️ by Arya.Sundanisee</div>
+      </aside>
+
+      <!-- RIGHT: UI -->
+      <section class="right" aria-live="polite">
+        <div class="tabs" role="tablist" aria-label="Auth Tabs">
+          <div class="tab active" id="tab-login" data-tab="auth" role="tab" tabindex="0">Login</div>
+          <div class="tab" id="tab-signin" data-tab="signin" role="tab" tabindex="0">Sign Up</div>
+        </div>
+
+        <div class="panel" id="authPanel">
+          <!-- AUTH SCREENS -->
+          <div id="auth-screen" class="screen active" aria-labelledby="tab-login">
+            <label for="in-user">Username</label>
+            <input id="in-user" class="input" placeholder="ketik username..." autocomplete="username" />
+            <label for="in-pass">Password</label>
+            <input id="in-pass" class="input" type="password" placeholder="password" autocomplete="current-password" />
+            <div class="row">
+              <button class="btn" id="btn-login">Masuk</button>
+              <button class="btn ghost" id="btn-guest">Guest</button>
+            </div>
+          </div>
+
+          <div id="signin-screen" class="screen" aria-labelledby="tab-signin" style="display:none">
+            <label for="si-user">Pilih username</label>
+            <input id="si-user" class="input" placeholder="username baru..." />
+            <label for="si-pass">Pilih password</label>
+            <input id="si-pass" class="input" type="password" placeholder="password baru..." />
+            <div class="row">
+              <button class="btn" id="btn-signin">Buat Akun</button>
+              <button class="btn ghost" id="btn-back">Kembali</button>
+            </div>
+          </div>
+
+          <!-- MENU (after login) -->
+          <div id="menu-screen" class="screen" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h2 style="margin:0">Halo, <span id="playerName">Player</span> 👋</h2>
+              <div class="pill" id="diffPill">Difficulty: <b>Easy</b></div>
+            </div>
+            <p style="margin-top:6px;color:var(--muted)">Pilih game & mode:</p>
+
+            <div style="margin-top:10px;">
+              <div class="row">
+                <button class="btn" id="diff-easy" data-diff="easy">Easy</button>
+                <button class="btn ghost" id="diff-medium" data-diff="medium">Medium</button>
+                <button class="btn ghost" id="diff-hard" data-diff="hard">Hard</button>
+                <button class="btn ghost" id="theme-toggle" style="margin-left:auto">Toggle Theme</button>
+              </div>
+            </div>
+
+            <div class="menu-grid" style="margin-top:12px;">
+              <div class="game-card" id="play-tictactoe" tabindex="0" role="button">
+                <strong>TicTacToe (2 Player)</strong>
+                <div style="margin-top:8px;color:var(--muted);font-size:13px;">Main berdua di 1 device — giliran X/O</div>
+              </div>
+
+              <div class="game-card" id="play-snake" tabindex="0" role="button">
+                <strong>Snake (Neon)</strong>
+                <div style="margin-top:8px;color:var(--muted);font-size:13px;">Makan buah → panjang & makin cepat</div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;" class="row">
+              <button class="btn ghost" id="btn-logout">Logout</button>
+              <div style="margin-left:auto; color:var(--muted); font-weight:700;">Highscore: <span id="highscore">0</span></div>
+            </div>
+          </div>
+
+          <!-- GAME AREA -->
+          <div id="game-screen" class="screen" style="display:none;">
+            <div class="game-head">
+              <h3 id="gameTitle" style="margin:0">Game</h3>
+              <div class="hud">
+                <div class="pill" id="liveScore">Score: 0</div>
+                <button class="btn ghost" id="btn-reset">Reset</button>
+                <button class="btn ghost" id="btn-back-menu">Back</button>
+              </div>
+            </div>
+
+            <div id="gameContent" style="margin-top:12px;"></div>
+
+            <div class="endbox" id="endMessage" aria-live="polite" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast and audio (hidden) -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <audio id="snd-click" src="" preload="auto"></audio>
+  <audio id="snd-eat" src="" preload="auto"></audio>
+  <audio id="snd-win" src="" preload="auto"></audio>
+
+<script>
+/* ===================================================================
+   Ultra Game Portal JS
+   Features: login, menu, tic-tac-toe (2p), snake neon, reset, confetti,
+   typing end message, sounds, localStorage highscore, theme toggle.
+   =================================================================== */
+
+/* ---------- tiny helper ---------- */
+const $ = (id)=>document.getElementById(id);
+const toast = (t)=>{ const el=$('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(el._); el._ = setTimeout(()=>el.classList.remove('show'), 1600); };
+
+/* ---------- confetti system ---------- */
+const confettiCanvas = document.createElement('canvas');
+confettiCanvas.id='confettiCanvas';
+confettiCanvas.style.position='fixed';
+confettiCanvas.style.inset='0';
+confettiCanvas.style.pointerEvents='none';
+confettiCanvas.style.zIndex='9999';
+document.body.appendChild(confettiCanvas);
+const confCtx = confettiCanvas.getContext('2d');
+let confettiParts = [];
+function resizeConfetti(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
+addEventListener('resize', resizeConfetti); resizeConfetti();
+function spawnConfetti(n=120){
+  for(let i=0;i<n;i++){
+    confettiParts.push({
+      x: Math.random()*confettiCanvas.width,
+      y: -20 - Math.random()*200,
+      w: 6 + Math.random()*8,
+      h: 6 + Math.random()*8,
+      vx: -2 + Math.random()*4,
+      vy: 1 + Math.random()*4,
+      angle: Math.random()*Math.PI*2,
+      vr: (-0.04 + Math.random()*0.08),
+      color: ['#ff4b1f','#ffd54b','#7bf7ff','#ff7bd6','#6a11cb','#57ff85'][Math.floor(Math.random()*6)],
+      life: 300 + Math.random()*200
+    });
+  }
+}
+function runConfetti(){
+  confCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+  for(const p of confettiParts){
+    p.x += p.vx; p.y += p.vy; p.angle += p.vr; p.vy += 0.02; p.life--;
+    confCtx.save();
+    confCtx.translate(p.x,p.y);
+    confCtx.rotate(p.angle);
+    confCtx.fillStyle = p.color;
+    confCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+    confCtx.restore();
+  }
+  confettiParts = confettiParts.filter(p => p.life>0 && p.y < confettiCanvas.height+50);
+  if(confettiParts.length) requestAnimationFrame(runConfetti);
+}
+
+/* ---------- sounds (synth-ish via WebAudio) ---------- */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AudioCtx ? new AudioCtx() : null;
+function playClick(){ if(!audioCtx) return; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=0.02; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.12); o.stop(audioCtx.currentTime+0.15); },120); }
+function playEat(){ if(!audioCtx) return; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='triangle'; o.frequency.value=560; g.gain.value=0.03; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.22); o.stop(audioCtx.currentTime+0.25); },220); }
+function playWin(){ if(!audioCtx) return; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='square'; o.frequency.value=440; g.gain.value=0.04; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>{ g.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime+0.3); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.8); o.stop(audioCtx.currentTime+0.85); },300); }
+
+/* ---------- UI wiring ---------- */
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t=> t.addEventListener('click', ()=>{
+  tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  const tab=t.dataset.tab;
+  $('auth-screen').style.display = tab==='auth' ? '' : 'none';
+  $('signin-screen').style.display = tab==='signin' ? '' : 'none';
+}));
+$('btn-login').addEventListener('click', doLogin);
+$('btn-guest').addEventListener('click', ()=>{ $('in-user').value='Guest'; doLogin(); });
+$('btn-signin').addEventListener('click', doSignin);
+$('btn-back').addEventListener('click', ()=>{ tabs.forEach(x=>x.style.display=''); document.getElementById('tab-login').click(); });
+$('btn-logout').addEventListener('click', logout);
+$('btn-reset').addEventListener('click', ()=>{ if(currentGame==='tictactoe') resetTTT(); if(currentGame==='snake') resetSnake(); });
+
+document.getElementById('play-tictactoe').addEventListener('click', ()=> chooseGame('tictactoe'));
+document.getElementById('play-snake').addEventListener('click', ()=> chooseGame('snake'));
+$('btn-back-menu').addEventListener('click', ()=> { stopAll(); $('game-screen').style.display='none'; $('menu-screen').style.display=''; currentGame=null; inGame=false; tabs.forEach(x=>x.style.display=''); });
+
+/* difficulty */
+const diffButtons = ['diff-easy','diff-medium','diff-hard'].map(id=>$(id));
+diffButtons.forEach(btn=> btn.addEventListener('click', ()=> setDifficulty(btn.dataset.diff)));
+function setDifficulty(d){
+  currentDifficulty = d;
+  $('diffPill').innerHTML = 'Difficulty: <b>'+d[0].toUpperCase()+d.slice(1)+'</b>';
+  diffButtons.forEach(b=> b.classList.toggle('ghost', b.dataset.diff!==d));
+  localStorage.setItem('aryagame_diff', d);
+  toast('Difficulty: '+d);
+}
+
+/* theme toggle */
+$('theme-toggle').addEventListener('click', ()=> {
+  document.documentElement.classList.toggle('softTheme');
+  toast('Theme toggled');
+});
+
+/* ---------- auth (in-memory demo) ---------- */
+const accounts = {};
+let currentPlayer = 'Player';
+let currentGame = null;
+let currentDifficulty = localStorage.getItem('aryagame_diff') || 'easy';
+setDifficulty(currentDifficulty);
+let inGame=false;
+
+function doSignin(){
+  const u=$('si-user').value.trim(); const p=$('si-pass').value;
+  if(!u||!p){ alert('Isi username & password'); return; }
+  accounts[u]=p; alert('Akun dibuat. Silakan login.'); document.getElementById('tab-login').click(); $('in-user').value=u;
+}
+function doLogin(){
+  const u=$('in-user').value.trim()||'Player'; const p=$('in-pass').value;
+  if(accounts[u] && accounts[u] !== p){ alert('Password salah'); return; }
+  currentPlayer=u; $('playerName').textContent = u;
+  $('auth-screen').style.display='none'; $('signin-screen').style.display='none';
+  document.querySelectorAll('.tab').forEach(t=>t.style.display='none');
+  $('menu-screen').style.display='';
+  $('highscore').textContent = localStorage.getItem('aryagame_highscore') || 0;
+  toast('Welcome '+u+'!');
+}
+function logout(){
+  $('in-user').value=''; $('in-pass').value='';
+  $('menu-screen').style.display='none'; $('auth-screen').style.display='';
+  document.querySelectorAll('.tab').forEach(t=>t.style.display='');
+}
+
+/* ---------- game choose ---------- */
+function chooseGame(name){
+  if(inGame && !confirm('Keluar dari game sekarang?')) return;
+  currentGame = name; inGame = true;
+  $('menu-screen').style.display='none'; $('game-screen').style.display='';
+  $('endMessage').style.display='none'; $('endMessage').textContent='';
+  $('gameTitle').textContent = name==='snake' ? 'Snake (Neon)' : 'TicTacToe (2P)';
+  if(name==='tictactoe') startTTT();
+  if(name==='snake') startSnake(currentDifficulty);
+}
+
+/* ---------- STOP ALL ---------- */
+function stopAll(){
+  stopTTT(); stopSnake();
+  $('endMessage').style.display='none';
+}
+
+/* ===================================================================
+   TicTacToe 2-player (no AI)
+   - Highlight winning line
+   - Reset button
+   - Turn indicator
+   =================================================================== */
+let tttState = null;
+function startTTT(){
+  stopAll();
+  currentGame='tictactoe';
+  tttState = { board: Array(9).fill(null), turn:'X', over:false };
+  renderTTT();
+  $('liveScore').textContent = 'Giliran: X';
+  $('endMessage').style.display='none'; $('endMessage').textContent='';
+}
+function renderTTT(highlight=[]){
+  const container = $('gameContent');
+  container.innerHTML = '';
+  const frame = document.createElement('div'); frame.className='ttt-frame';
+  const grid = document.createElement('div'); grid.className='ttt-grid';
+  tttState.board.forEach((v,i)=>{
+    const c = document.createElement('div'); c.className='ttt-cell'; c.setAttribute('role','button'); c.tabIndex=0;
+    if(v){ c.textContent=v; c.classList.add(v==='X'?'ttt-x':'ttt-o'); }
+    if(highlight.includes(i)) c.classList.add('ttt-win');
+    c.addEventListener('click', ()=> tttPlace(i, c));
+    c.addEventListener('keydown', (e)=>{ if(e.key==='Enter') tttPlace(i,c); });
+    grid.appendChild(c);
+  });
+  frame.appendChild(grid);
+  container.appendChild(frame);
+}
+function tttPlace(i, el){
+  if(!tttState || tttState.over) return;
+  if(tttState.board[i]) return;
+  tttState.board[i] = tttState.turn;
+  playClick();
+  const win = tttCheckWin(tttState.board);
+  if(win){ tttState.over=true; highlightWin(win.line); showEnd('🏆 Player '+win.winner+' menang!'); saveHighscore(0); playWin(); return; }
+  if(tttState.board.every(Boolean)){ tttState.over=true; showEnd('🤝 Seri!'); return; }
+  tttState.turn = tttState.turn==='X' ? 'O' : 'X';
+  $('liveScore').textContent = 'Giliran: '+tttState.turn;
+  renderTTT();
+}
+function tttCheckWin(b){
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const L of lines){
+    const [a,c,d]=L;
+    if(b[a] && b[a]===b[c] && b[a]===b[d]) return { winner: b[a], line:L };
+  }
+  return null;
+}
+function highlightWin(line){
+  renderTTT(line);
+}
+function showEnd(message){
+  const full = message + '\n\nTErimakasih telah memainkan game arya.sundanise.\nzulfikararyarahmat@gmail.com';
+  typeText(full, $('endMessage'), 12);
+  $('endMessage').style.display='';
+  spawnConfetti(140);
+  runConfetti();
+}
+function typeText(text, el, speed=20){
+  el.textContent=''; let i=0;
+  const id = setInterval(()=>{ el.textContent = text.slice(0, ++i); if(i>=text.length) clearInterval(id); }, speed);
+}
+function resetTTT(){
+  startTTT();
+  toast('TicTacToe direset');
+}
+function stopTTT(){ if(tttState) tttState.over=true; }
+
+/* ===================================================================
+   Snake Neon
+   - Grid overlay, neon snake, rotating food
+   - Speed increases on food
+   - Reset & difficulty
+   - Save highest score
+   =================================================================== */
+let snakeHandle = null;
+let snakeContext = null;
+let snakeState = null;
+
+function startSnake(diff){
+  stopAll();
+  currentGame='snake';
+  const container = $('gameContent');
+  container.innerHTML = '';
+  const wrap = document.createElement('div'); wrap.className='canvas-wrap';
+  const overlay = document.createElement('div'); overlay.className='grid-overlay';
+  const canvas = document.createElement('canvas'); canvas.id='snakeCanvas'; canvas.width=460; canvas.height=460;
+  wrap.appendChild(canvas); wrap.appendChild(overlay); container.appendChild(wrap);
+  snakeContext = canvas.getContext('2d');
+
+  const cell = 20;
+  const speeds = { easy:150, medium:110, hard:70 };
+  let speed = speeds[diff] || 150;
+  let dir = {x:0,y:0};
+  let body = [{x:10*cell,y:10*cell}];
+  let food = randFood(canvas, cell);
+  let score=0;
+  $('liveScore').textContent = 'Score: 0';
+  $('diffPill').innerHTML = 'Difficulty: <b>'+diff[0].toUpperCase()+diff.slice(1)+'</b>';
+
+  function randFood(cvs, cellSize){
+    const cols = Math.floor(cvs.width/cellSize), rows = Math.floor(cvs.height/cellSize);
+    return { x: Math.floor(Math.random()*cols)*cellSize, y: Math.floor(Math.random()*rows)*cellSize };
+  }
+
+  function key(e){
+    if(e.key==='ArrowUp' && dir.y===0) dir={x:0,y:-1};
+    if(e.key==='ArrowDown' && dir.y===0) dir={x:0,y:1};
+    if(e.key==='ArrowLeft' && dir.x===0) dir={x:-1,y:0};
+    if(e.key==='ArrowRight' && dir.x===0) dir={x:1,y:0};
+  }
+  addEventListener('keydown', key);
+
+  snakeState = { stop: ()=> { clearInterval(snakeHandle); removeEventListener('keydown', key); }, body, dirRef: ()=>dir };
+
+  let angle = 0;
+  snakeHandle = setInterval(()=>{
+    // move head
+    const head = { x: body[0].x + dir.x*cell, y: body[0].y + dir.y*cell };
+    if(head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || body.some((s,i)=> i>0 && s.x===head.x && s.y===head.y)){
+      // game over
+      snakeState.stop();
+      showEnd('Game Over!');
+      saveHighscore(score);
+      return;
+    }
+    body.unshift(head);
+    // eat?
+    if(head.x===food.x && head.y===food.y){
+      score++; $('liveScore').textContent = 'Score: '+score;
+      playEat();
+      food = randFood(canvas, cell);
+      // speed up a bit
+      if(speed>35){ speed = Math.max(35, speed - (diff==='hard'? 10 : diff==='medium'? 6 : 3)); clearInterval(snakeHandle); snakeHandle = setInterval(arguments.callee, speed); snakeState.stop = ()=>{ clearInterval(snakeHandle); removeEventListener('keydown', key); }; }
+    } else body.pop();
+
+    // draw background
+    const ctx = snakeContext;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const g = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+    g.addColorStop(0,'#02040a'); g.addColorStop(1,'#071022'); ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // rotating food (diamond)
+    angle += 0.2;
+    ctx.save(); ctx.translate(food.x+cell/2, food.y+cell/2); ctx.rotate(angle);
+    ctx.fillStyle = '--food'; ctx.fillStyle='#ffd54b'; ctx.shadowColor='#ffd54b'; ctx.shadowBlur=16;
+    ctx.fillRect(-cell/3, -cell/3, (cell/3)*2, (cell/3)*2); ctx.restore(); ctx.shadowBlur=0;
+
+    // snake neon
+    for(let i=0;i<body.length;i++){
+      const s = body[i];
+      const t = i / Math.max(1, body.length-1);
+      const r = Math.floor(255*(1-t)), gC = Math.floor(120*(t)), b = Math.floor(255*t);
+      ctx.save();
+      ctx.fillStyle = `rgba(${r},${gC},${b},1)`;
+      ctx.beginPath();
+      ctx.arc(s.x+cell/2, s.y+cell/2, cell/2 - 2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.shadowColor = `rgba(${r},${gC},${b},0.4)`; ctx.shadowBlur = 10;
+      ctx.beginPath(); ctx.arc(s.x+cell/2, s.y+cell/2, cell/2 - 2, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }, speed);
+}
+
+function resetSnake(){
+  if(snakeState && snakeState.stop) snakeState.stop();
+  startSnake(currentDifficulty);
+  toast('Snake direset');
+}
+
+function stopSnake(){ if(snakeState && snakeState.stop) snakeState.stop(); snakeState=null; }
+
+/* ---------- highscore (localStorage) ---------- */
+function saveHighscore(score){
+  const prev = parseInt(localStorage.getItem('aryagame_highscore')||0,10);
+  if(score>prev){ localStorage.setItem('aryagame_highscore', score); $('highscore').textContent = score; toast('New Highscore: '+score); }
+}
+
+/* ---------- helpers ---------- */
+function playClick(){ try{ playClickSound(); }catch(e){} }
+function playEat(){ try{ playEatSound(); }catch(e){} }
+function playWin(){ try{ playWinSound(); }catch(e){} }
+
+/* tiny click sound wrappers that trigger AudioContext on first user gesture */
+let _audioInit=false;
+function ensureAudio(){
+  if(_audioInit || !audioCtx) return;
+  // create a short silent buffer to unlock
+  const buf = audioCtx.createBuffer(1,1,audioCtx.sampleRate);
+  const src = audioCtx.createBufferSource(); src.buffer=buf; src.connect(audioCtx.destination); src.start(0);
+  _audioInit=true;
+}
+document.addEventListener('click', ()=> ensureAudio(), {once:true});
+
+/* wrapper play functions already defined earlier */
+function playClickSound(){ playClick(); }
+function playEatSound(){ playEat(); }
+function playWinSound(){ playWin(); }
+
+/* ---------- End message helpers ---------- */
+function spawnConfetti(n=160){ spawnConfettiParts(n); }
+function spawnConfettiParts(n){ for(let i=0;i<n;i++) confettiParts.push({
+  x: Math.random()*confettiCanvas.width,
+  y: -20 - Math.random()*200,
+  w: 6 + Math.random()*8,
+  h: 6 + Math.random()*8,
+  vx: -2 + Math.random()*4,
+  vy: 1 + Math.random()*4,
+  angle: Math.random()*Math.PI*2,
+  vr: (-0.04 + Math.random()*0.08),
+  color: ['#ff4b1f','#ffd54b','#7bf7ff','#ff7bd6','#6a11cb','#57ff85'][Math.floor(Math.random()*6)],
+  life: 300 + Math.random()*200
+}); requestAnimationFrame(runConfetti); }
+
+/* ---------- keyboard accessibility for navigation ---------- */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){ if(inGame){ if(confirm('Keluar dari game?')) { $('btn-back-menu').click(); } } }
+});
+
+/* ---------- init ---------- */
+(function init(){
+  document.getElementById('tab-login').click();
+  // prefill from localStorage
+  const prevDiff = localStorage.getItem('aryagame_diff') || 'easy';
+  setDifficulty(prevDiff);
+  $('highscore').textContent = localStorage.getItem('aryagame_highscore') || 0;
+})();
+
+</script>
+</body>
+</html>
